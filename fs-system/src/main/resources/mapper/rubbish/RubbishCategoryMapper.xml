@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="team.fs.rubbish.mapper.RubbishCategoryMapper">
+
+    <resultMap type="RubbishCategory" id="RubbishCategoryResult">
+        <result property="categoryId"    column="category_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="disposalWay"    column="disposal_way"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectRubbishCategoryVo">
+        select category_id, parent_id, ancestors, category_name, disposal_way, create_by, create_time, update_by, update_time, remark from rubbish_category
+    </sql>
+
+    <select id="selectRubbishCategoryList" parameterType="RubbishCategory" resultMap="RubbishCategoryResult">
+        <include refid="selectRubbishCategoryVo"/>
+        <where>
+            <if test="parentId != null  and parentId != ''"> and parent_id = #{parentId}</if>
+            <if test="categoryName != null  and categoryName != ''"> and category_name like concat('%', #{categoryName}, '%')</if>
+            <if test="disposalWay != null  and disposalWay != ''"> and disposal_way = #{disposalWay}</if>
+        </where>
+    </select>
+
+    <select id="selectRubbishCategoryByCategoryId" parameterType="String" resultMap="RubbishCategoryResult">
+        <include refid="selectRubbishCategoryVo"/>
+        where category_id = #{categoryId}
+    </select>
+
+    <insert id="insertRubbishCategory" parameterType="RubbishCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        insert into rubbish_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="ancestors != null and ancestors != ''">ancestors,</if>
+            <if test="categoryName != null and categoryName != ''">category_name,</if>
+            <if test="disposalWay != null">disposal_way,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ancestors != null and ancestors != ''">#{ancestors},</if>
+            <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="disposalWay != null">#{disposalWay},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRubbishCategory" parameterType="RubbishCategory">
+        update rubbish_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ancestors != null and ancestors != ''">ancestors = #{ancestors},</if>
+            <if test="categoryName != null and categoryName != ''">category_name = #{categoryName},</if>
+            <if test="disposalWay != null">disposal_way = #{disposalWay},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteRubbishCategoryByCategoryId" parameterType="String">
+        delete from rubbish_category where category_id = #{categoryId}
+    </delete>
+
+    <delete id="deleteRubbishCategoryByCategoryIds" parameterType="String">
+        delete from rubbish_category where category_id in
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>
+</mapper>

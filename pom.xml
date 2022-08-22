@@ -186,6 +186,12 @@
                 <version>${fs.version}</version>
             </dependency>
 
+            <!-- 垃圾管理 -->
+            <dependency>
+                <groupId>team.fs</groupId>
+                <artifactId>rubbish</artifactId>
+                <version>${fs.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
