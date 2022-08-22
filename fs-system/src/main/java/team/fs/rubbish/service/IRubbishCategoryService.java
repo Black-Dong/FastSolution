@@ -57,7 +57,11 @@ public interface IRubbishCategoryService
      * @param categoryId 分类管理主键
      * @return 结果
      */
-    public int deleteRubbishCategoryByCategoryId(String categoryId);
+    public int deleteRubbishCategoryByCategoryId(Long categoryId);
 
     String checkCategoryNameUnique(RubbishCategory rubbishCategory);
+
+    boolean hasChildByCategoryId(Long categoryId);
+
+    boolean checkCategoryExistRubbish(Long categoryId);
 }

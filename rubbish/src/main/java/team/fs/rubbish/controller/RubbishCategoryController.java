@@ -117,8 +117,14 @@ public class RubbishCategoryController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('rubbish:category:remove')")
     @Log(title = "分类管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{categoryIds}")
-    public AjaxResult remove(@PathVariable String[] categoryIds) {
-        return toAjax(rubbishCategoryService.deleteRubbishCategoryByCategoryIds(categoryIds));
+    @DeleteMapping("/{categoryId}")
+    public AjaxResult remove(@PathVariable Long categoryId) {
+        if (rubbishCategoryService.hasChildByCategoryId(categoryId)) {
+            return AjaxResult.error("存在下级分类,不允许删除");
+        }
+        if (rubbishCategoryService.checkCategoryExistRubbish(categoryId)) {
+            return AjaxResult.error("部门存在用户,不允许删除");
+        }
+        return toAjax(rubbishCategoryService.deleteRubbishCategoryByCategoryId(categoryId));
     }
 }

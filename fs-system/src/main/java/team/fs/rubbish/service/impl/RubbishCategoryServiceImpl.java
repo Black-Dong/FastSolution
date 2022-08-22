@@ -116,7 +116,7 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
      * @return 结果
      */
     @Override
-    public int deleteRubbishCategoryByCategoryId(String categoryId) {
+    public int deleteRubbishCategoryByCategoryId(Long categoryId) {
         return rubbishCategoryMapper.deleteRubbishCategoryByCategoryId(categoryId);
     }
 
@@ -129,5 +129,17 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    @Override
+    public boolean hasChildByCategoryId(Long categoryId) {
+
+        int result = rubbishCategoryMapper.hasChildByDeptId(categoryId);
+        return result > 0;
+    }
+
+    @Override
+    public boolean checkCategoryExistRubbish(Long categoryId) {
+        return false;
     }
 }

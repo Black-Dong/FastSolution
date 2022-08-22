@@ -42,6 +42,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectRubbishCategoryVo"/>
         where category_name=#{categoryName} and parent_id = #{parentId} limit 1
     </select>
+    <select id="hasChildByDeptId" parameterType="Long" resultType="int">
+        select count(1) from rubbish_category
+        where parent_id = #{categoryId} limit 1
+    </select>
 
     <insert id="insertRubbishCategory" parameterType="RubbishCategory" useGeneratedKeys="true" keyProperty="categoryId">
         insert into rubbish_category
@@ -97,7 +101,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </update>
 
-    <delete id="deleteRubbishCategoryByCategoryId" parameterType="String">
+    <delete id="deleteRubbishCategoryByCategoryId" parameterType="Long">
         delete from rubbish_category where category_id = #{categoryId}
     </delete>
 

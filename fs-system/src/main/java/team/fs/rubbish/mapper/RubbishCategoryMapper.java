@@ -51,7 +51,7 @@ public interface RubbishCategoryMapper
      * @param categoryId 分类管理主键
      * @return 结果
      */
-    public int deleteRubbishCategoryByCategoryId(String categoryId);
+    public int deleteRubbishCategoryByCategoryId(Long categoryId);
 
     /**
      * 批量删除分类管理
@@ -66,4 +66,6 @@ public interface RubbishCategoryMapper
     int updateCategoryChildren(@Param("categorys") List<RubbishCategory> children);
 
     RubbishCategory checkCategoryNameUnique(@Param("categoryName") String categoryName,@Param("parentId") Long parentId);
+
+    int hasChildByDeptId(Long categoryId);
 }
