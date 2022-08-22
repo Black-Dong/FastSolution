@@ -8,6 +8,13 @@ export function listCategory(query) {
     params: query
   })
 }
+// 查询部门列表（排除节点）
+export function listCategoryExcludeChild(categoryId) {
+  return request({
+    url: '/rubbish/category/list/exclude/' + categoryId,
+    method: 'get'
+  })
+}
 
 // 查询分类管理详细
 export function getCategory(categoryId) {

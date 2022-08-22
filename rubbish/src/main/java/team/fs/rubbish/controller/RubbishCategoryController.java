@@ -1,18 +1,23 @@
 package team.fs.rubbish.controller;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import team.fs.common.annotation.Log;
+import team.fs.common.constant.UserConstants;
 import team.fs.common.core.controller.BaseController;
 import team.fs.common.core.domain.AjaxResult;
+import team.fs.common.core.domain.entity.SysDept;
 import team.fs.common.core.page.TableDataInfo;
 import team.fs.common.enums.BusinessType;
+import team.fs.common.utils.StringUtils;
 import team.fs.common.utils.poi.ExcelUtil;
 import team.fs.rubbish.domain.RubbishCategory;
 import team.fs.rubbish.service.IRubbishCategoryService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,10 +37,27 @@ public class RubbishCategoryController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('rubbish:category:list')")
     @GetMapping("/list")
-    public TableDataInfo list(RubbishCategory rubbishCategory) {
-        startPage();
+    public AjaxResult list(RubbishCategory rubbishCategory) {
         List<RubbishCategory> list = rubbishCategoryService.selectRubbishCategoryList(rubbishCategory);
-        return getDataTable(list);
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 查询部门列表（排除节点）
+     */
+    @PreAuthorize("@ss.hasPermi('rubbish:category:list')")
+    @GetMapping("/list/exclude/{categoryId}")
+    public AjaxResult excludeChild(@PathVariable(value = "categoryId", required = false) Long categoryId) {
+        List<RubbishCategory> categoryList = rubbishCategoryService.selectRubbishCategoryList(new RubbishCategory());
+        Iterator<RubbishCategory> it = categoryList.iterator();
+        while (it.hasNext()) {
+            RubbishCategory d = (RubbishCategory) it.next();
+            if (d.getCategoryId().intValue() == categoryId
+                    || ArrayUtils.contains(StringUtils.split(d.getAncestors(), ","), categoryId + "")) {
+                it.remove();
+            }
+        }
+        return AjaxResult.success(categoryList);
     }
 
     /**
@@ -55,7 +77,7 @@ public class RubbishCategoryController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('rubbish:category:query')")
     @GetMapping(value = "/{categoryId}")
-    public AjaxResult getInfo(@PathVariable("categoryId") String categoryId) {
+    public AjaxResult getInfo(@PathVariable("categoryId") Long categoryId) {
         return AjaxResult.success(rubbishCategoryService.selectRubbishCategoryByCategoryId(categoryId));
     }
 
@@ -66,6 +88,7 @@ public class RubbishCategoryController extends BaseController {
     @Log(title = "分类管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody RubbishCategory rubbishCategory) {
+        rubbishCategory.setCreateBy(getUsername());
         return toAjax(rubbishCategoryService.insertRubbishCategory(rubbishCategory));
     }
 
@@ -76,6 +99,16 @@ public class RubbishCategoryController extends BaseController {
     @Log(title = "分类管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody RubbishCategory rubbishCategory) {
+        Long categoryId = rubbishCategory.getCategoryId();
+        // rubbishCategoryService.checkDeptDataScope(categoryId);
+        if (UserConstants.NOT_UNIQUE.equals(rubbishCategoryService.checkCategoryNameUnique(rubbishCategory))) {
+            return AjaxResult.error("修改垃圾分类'" + rubbishCategory.getCategoryName() + "'失败，分类名称已存在");
+        } else if (rubbishCategory.getParentId().equals(categoryId)) {
+            return AjaxResult.error("修改垃圾分类'" + rubbishCategory.getCategoryName() + "'失败，上级部门不能是自己");
+        } /* else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0) {
+            return AjaxResult.error("该部门包含未停用的子部门！");
+        } */
+        rubbishCategory.setUpdateBy(getUsername());
         return toAjax(rubbishCategoryService.updateRubbishCategory(rubbishCategory));
     }
 

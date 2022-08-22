@@ -16,11 +16,11 @@ public class RubbishCategory extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 垃圾分类id */
-    private String categoryId;
+    private Long categoryId;
 
     /** 父id */
     @Excel(name = "父id")
-    private String parentId;
+    private Long parentId;
 
     /** 祖级id */
     private String ancestors;
@@ -33,21 +33,21 @@ public class RubbishCategory extends BaseEntity
     @Excel(name = "处置方式")
     private String disposalWay;
 
-    public void setCategoryId(String categoryId)
+    public void setCategoryId(Long categoryId)
     {
         this.categoryId = categoryId;
     }
 
-    public String getCategoryId()
+    public Long getCategoryId()
     {
         return categoryId;
     }
-    public void setParentId(String parentId)
+    public void setParentId(Long parentId)
     {
         this.parentId = parentId;
     }
 
-    public String getParentId()
+    public Long getParentId()
     {
         return parentId;
     }

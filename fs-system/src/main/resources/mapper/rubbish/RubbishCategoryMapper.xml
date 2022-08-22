@@ -30,9 +30,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectRubbishCategoryByCategoryId" parameterType="String" resultMap="RubbishCategoryResult">
+    <select id="selectRubbishCategoryByCategoryId" parameterType="Long" resultMap="RubbishCategoryResult">
         <include refid="selectRubbishCategoryVo"/>
         where category_id = #{categoryId}
+    </select>
+    <select id="selectChildrenCategoryById" resultMap="RubbishCategoryResult">
+        <include refid="selectRubbishCategoryVo"/>
+        where find_in_set(#{categoryId}, ancestors)
+    </select>
+    <select id="checkCategoryNameUnique" resultType="team.fs.rubbish.domain.RubbishCategory">
+        <include refid="selectRubbishCategoryVo"/>
+        where category_name=#{categoryName} and parent_id = #{parentId} limit 1
     </select>
 
     <insert id="insertRubbishCategory" parameterType="RubbishCategory" useGeneratedKeys="true" keyProperty="categoryId">
@@ -75,6 +83,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
         </trim>
         where category_id = #{categoryId}
+    </update>
+    <update id="updateCategoryChildren">
+        update rubbish_category set ancestors =
+        <foreach collection="categorys" item="item" index="index"
+                 separator=" " open="case category_id" close="end">
+            when #{item.categoryId} then #{item.ancestors}
+        </foreach>
+        where category_id in
+        <foreach collection="categorys" item="item" index="index"
+                 separator="," open="(" close=")">
+            #{item.categoryId}
+        </foreach>
     </update>
 
     <delete id="deleteRubbishCategoryByCategoryId" parameterType="String">

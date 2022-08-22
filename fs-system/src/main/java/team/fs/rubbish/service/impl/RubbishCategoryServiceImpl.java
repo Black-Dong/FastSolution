@@ -1,14 +1,16 @@
 package team.fs.rubbish.service.impl;
 
-import java.util.List;
-
-import team.fs.common.core.domain.entity.SysDept;
-import team.fs.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import team.fs.rubbish.mapper.RubbishCategoryMapper;
+import team.fs.common.constant.UserConstants;
+import team.fs.common.core.domain.entity.SysDept;
+import team.fs.common.utils.DateUtils;
+import team.fs.common.utils.StringUtils;
 import team.fs.rubbish.domain.RubbishCategory;
+import team.fs.rubbish.mapper.RubbishCategoryMapper;
 import team.fs.rubbish.service.IRubbishCategoryService;
+
+import java.util.List;
 
 /**
  * 分类管理Service业务层处理
@@ -28,7 +30,7 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
      * @return 分类管理
      */
     @Override
-    public RubbishCategory selectRubbishCategoryByCategoryId(String categoryId) {
+    public RubbishCategory selectRubbishCategoryByCategoryId(Long categoryId) {
         return rubbishCategoryMapper.selectRubbishCategoryByCategoryId(categoryId);
     }
 
@@ -66,8 +68,34 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
      */
     @Override
     public int updateRubbishCategory(RubbishCategory rubbishCategory) {
+        RubbishCategory newParentRubbishCategory = rubbishCategoryMapper.selectRubbishCategoryByCategoryId(rubbishCategory.getParentId());
+        RubbishCategory oldRubbishCategory = rubbishCategoryMapper.selectRubbishCategoryByCategoryId(rubbishCategory.getCategoryId());
+        if (StringUtils.isNotNull(newParentRubbishCategory) && StringUtils.isNotNull(oldRubbishCategory)) {
+            String newAncestors = newParentRubbishCategory.getAncestors() + "," + newParentRubbishCategory.getCategoryId();
+            String oldAncestors = oldRubbishCategory.getAncestors();
+            rubbishCategory.setAncestors(newAncestors);
+            updateCategoryChildren(rubbishCategory.getCategoryId(), newAncestors, oldAncestors);
+        }
         rubbishCategory.setUpdateTime(DateUtils.getNowDate());
-        return rubbishCategoryMapper.updateRubbishCategory(rubbishCategory);
+        int result = rubbishCategoryMapper.updateRubbishCategory(rubbishCategory);
+        return result;
+    }
+
+    /**
+     * 修改子元素关系
+     *
+     * @param categoryId   被修改的部门ID
+     * @param newAncestors 新的父ID集合
+     * @param oldAncestors 旧的父ID集合
+     */
+    public void updateCategoryChildren(Long categoryId, String newAncestors, String oldAncestors) {
+        List<RubbishCategory> children = rubbishCategoryMapper.selectChildrenCategoryById(categoryId);
+        for (RubbishCategory child : children) {
+            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+        }
+        if (children.size() > 0) {
+            rubbishCategoryMapper.updateCategoryChildren(children);
+        }
     }
 
     /**
@@ -90,5 +118,16 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
     @Override
     public int deleteRubbishCategoryByCategoryId(String categoryId) {
         return rubbishCategoryMapper.deleteRubbishCategoryByCategoryId(categoryId);
+    }
+
+    @Override
+    public String checkCategoryNameUnique(RubbishCategory rubbishCategory) {
+        Long categoryId = StringUtils.isNull(rubbishCategory.getCategoryId())
+                ? -1L : rubbishCategory.getCategoryId();
+        RubbishCategory info = rubbishCategoryMapper.checkCategoryNameUnique(rubbishCategory.getCategoryName(), rubbishCategory.getParentId());
+        if (StringUtils.isNotNull(info) && info.getCategoryId().longValue() != categoryId.longValue()) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 }

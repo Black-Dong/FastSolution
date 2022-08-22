@@ -26,49 +26,35 @@
           v-hasPermi="['rubbish:category:add']"
         >新增</el-button>
       </el-col>
+<!--      <el-col :span="1.5">-->
+<!--        <el-button-->
+<!--          type="warning"-->
+<!--          plain-->
+<!--          icon="el-icon-download"-->
+<!--          size="mini"-->
+<!--          @click="handleExport"-->
+<!--          v-hasPermi="['rubbish:category:export']"-->
+<!--        >导出</el-button>-->
+<!--      </el-col>-->
       <el-col :span="1.5">
         <el-button
-          type="success"
+          type="info"
           plain
-          icon="el-icon-edit"
+          icon="el-icon-sort"
           size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['rubbish:category:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['rubbish:category:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['rubbish:category:export']"
-        >导出</el-button>
+          @click="toggleExpandAll"
+        >展开/折叠</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="categoryList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="垃圾分类id" align="center" prop="categoryId" />
-      <el-table-column label="父id" align="center" prop="parentId" />
-      <el-table-column label="垃圾分类名称" align="center" prop="categoryName" />
-      <el-table-column label="处置方式" align="center" prop="disposalWay" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+    <el-table v-loading="loading" :data="categoryList" @selection-change="handleSelectionChange"
+              v-if="refreshTable" :default-expand-all="isExpandAll" row-key="categoryId"
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+      <el-table-column label="分类名称" width="200" prop="categoryName" />
+      <el-table-column label="处置方式" prop="disposalWay" show-tooltip-when-overflow/>
+      <el-table-column label="备注" prop="remark" show-tooltip-when-overflow/>
+      <el-table-column label="操作" width="150" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -80,6 +66,14 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-plus"
+            @click="handleAdd(scope.row)"
+            v-hasPermi="['rubbish:category:add']"
+          >新增</el-button>
+          <el-button
+            v-if="scope.row.parentId != 0"
+            size="mini"
+            type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['rubbish:category:remove']"
@@ -88,17 +82,13 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
     <!-- 添加或修改分类管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="上级部门" prop="parentId" v-if="form.parentId !== 0">
+          <treeselect v-model="form.parentId" :options="categoryOptions" :normalizer="normalizer" placeholder="选择上级部门" />
+        </el-form-item>
+
         <el-form-item label="分类名称" prop="categoryName">
           <el-input v-model="form.categoryName" placeholder="请输入垃圾分类名称" />
         </el-form-item>
@@ -119,10 +109,14 @@
 </template>
 
 <script>
-import { listCategory, getCategory, delCategory, addCategory, updateCategory } from "@/api/rubbish/category";
+import { listCategory, listCategoryExcludeChild, getCategory, delCategory, addCategory, updateCategory } from "@/api/rubbish/category";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
 
 export default {
   name: "Category",
+  components: { Treeselect },
   data() {
     return {
       // 遮罩层
@@ -145,32 +139,55 @@ export default {
       open: false,
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        parentId: null,
-        categoryName: null,
-        disposalWay: null,
+        categoryName: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        parentId: [
+          { required: true, message: "上级分类不能为空", trigger: "blur" }
+        ],
         categoryName: [
           { required: true, message: "垃圾分类名称不能为空", trigger: "blur" }
         ],
-      }
+      },
+      // 是否展开，默认全部展开
+      isExpandAll: false,
+      // 重新渲染表格状态
+      refreshTable: true,
+      // 分类树选项
+      categoryOptions: [],
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    /** 转换数据结构 */
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children;
+      }
+      return {
+        id: node.categoryId,
+        label: node.categoryName,
+        children: node.children
+      };
+    },
+    /** 展开/折叠操作 */
+    toggleExpandAll() {
+      this.refreshTable = false;
+      this.isExpandAll = !this.isExpandAll;
+      this.$nextTick(() => {
+        this.refreshTable = true;
+      });
+    },
     /** 查询分类管理列表 */
     getList() {
       this.loading = true;
       listCategory(this.queryParams).then(response => {
-        this.categoryList = response.rows;
-        this.total = response.total;
+        this.categoryList = this.handleTree(response.data, "categoryId");
         this.loading = false;
       });
     },
@@ -211,19 +228,28 @@ export default {
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
-    handleAdd() {
+    handleAdd(row) {
       this.reset();
       this.open = true;
       this.title = "添加分类管理";
+      if (row != undefined) {
+        this.form.parentId = row.categoryId;
+      }
+      listCategory().then(response => {
+        this.categoryOptions = this.handleTree(response.data, "categoryId");
+      });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const categoryId = row.categoryId || this.ids
+      const categoryId = row.categoryId
       getCategory(categoryId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改分类管理";
+      });
+      listCategoryExcludeChild(row.categoryId).then(response => {
+        this.categoryOptions = this.handleTree(response.data, "categoryId");
       });
     },
     /** 提交按钮 */

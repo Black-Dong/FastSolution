@@ -5,23 +5,23 @@ import team.fs.rubbish.domain.RubbishCategory;
 
 /**
  * 分类管理Service接口
- * 
+ *
  * @author Dong
  * @date 2022-08-22
  */
-public interface IRubbishCategoryService 
+public interface IRubbishCategoryService
 {
     /**
      * 查询分类管理
-     * 
+     *
      * @param categoryId 分类管理主键
      * @return 分类管理
      */
-    public RubbishCategory selectRubbishCategoryByCategoryId(String categoryId);
+    public RubbishCategory selectRubbishCategoryByCategoryId(Long categoryId);
 
     /**
      * 查询分类管理列表
-     * 
+     *
      * @param rubbishCategory 分类管理
      * @return 分类管理集合
      */
@@ -29,7 +29,7 @@ public interface IRubbishCategoryService
 
     /**
      * 新增分类管理
-     * 
+     *
      * @param rubbishCategory 分类管理
      * @return 结果
      */
@@ -37,7 +37,7 @@ public interface IRubbishCategoryService
 
     /**
      * 修改分类管理
-     * 
+     *
      * @param rubbishCategory 分类管理
      * @return 结果
      */
@@ -45,7 +45,7 @@ public interface IRubbishCategoryService
 
     /**
      * 批量删除分类管理
-     * 
+     *
      * @param categoryIds 需要删除的分类管理主键集合
      * @return 结果
      */
@@ -53,9 +53,11 @@ public interface IRubbishCategoryService
 
     /**
      * 删除分类管理信息
-     * 
+     *
      * @param categoryId 分类管理主键
      * @return 结果
      */
     public int deleteRubbishCategoryByCategoryId(String categoryId);
+
+    String checkCategoryNameUnique(RubbishCategory rubbishCategory);
 }
