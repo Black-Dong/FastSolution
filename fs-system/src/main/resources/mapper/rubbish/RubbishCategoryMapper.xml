@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectRubbishCategoryVo"/>
         where find_in_set(#{categoryId}, ancestors)
     </select>
-    <select id="checkCategoryNameUnique" resultType="team.fs.rubbish.domain.RubbishCategory">
+    <select id="checkCategoryNameUnique" resultMap="RubbishCategoryResult">
         <include refid="selectRubbishCategoryVo"/>
         where category_name=#{categoryName} and parent_id = #{parentId} limit 1
     </select>

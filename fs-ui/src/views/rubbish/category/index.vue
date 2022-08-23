@@ -49,7 +49,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="categoryList" @selection-change="handleSelectionChange"
-              v-if="refreshTable" :default-expand-all="isExpandAll" row-key="categoryId"
+              v-if="refreshTable"  :default-expand-all="isExpandAll" row-key="categoryId"
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column label="分类名称" width="200" prop="categoryName" />
       <el-table-column label="处置方式" prop="disposalWay" show-tooltip-when-overflow/>
@@ -62,6 +62,7 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['rubbish:category:edit']"
+            v-if="scope.row.parentId != null && scope.row.parentId !== ''"
           >修改</el-button>
           <el-button
             size="mini"
@@ -71,7 +72,7 @@
             v-hasPermi="['rubbish:category:add']"
           >新增</el-button>
           <el-button
-            v-if="scope.row.parentId != 0"
+            v-if="scope.row.parentId != 0 && scope.row.parentId != null && scope.row.parentId !== ''"
             size="mini"
             type="text"
             icon="el-icon-delete"
@@ -153,7 +154,7 @@ export default {
         ],
       },
       // 是否展开，默认全部展开
-      isExpandAll: false,
+      isExpandAll: true,
       // 重新渲染表格状态
       refreshTable: true,
       // 分类树选项

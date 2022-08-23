@@ -88,6 +88,9 @@ public class RubbishCategoryController extends BaseController {
     @Log(title = "分类管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody RubbishCategory rubbishCategory) {
+        if (UserConstants.NOT_UNIQUE.equals(rubbishCategoryService.checkCategoryNameUnique(rubbishCategory))) {
+            return AjaxResult.error("新增垃圾分类'" + rubbishCategory.getCategoryName() + "'失败，分类名称已存在");
+        }
         rubbishCategory.setCreateBy(getUsername());
         return toAjax(rubbishCategoryService.insertRubbishCategory(rubbishCategory));
     }
@@ -123,7 +126,7 @@ public class RubbishCategoryController extends BaseController {
             return AjaxResult.error("存在下级分类,不允许删除");
         }
         if (rubbishCategoryService.checkCategoryExistRubbish(categoryId)) {
-            return AjaxResult.error("部门存在用户,不允许删除");
+            return AjaxResult.error("分类下存在垃圾信息,不允许删除");
         }
         return toAjax(rubbishCategoryService.deleteRubbishCategoryByCategoryId(categoryId));
     }
