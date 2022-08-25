@@ -2,12 +2,14 @@ package team.fs.rubbish.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import team.fs.common.constant.UserConstants;
 import team.fs.common.core.domain.entity.SysDept;
 import team.fs.common.utils.DateUtils;
 import team.fs.common.utils.StringUtils;
 import team.fs.rubbish.domain.RubbishCategory;
 import team.fs.rubbish.mapper.RubbishCategoryMapper;
+import team.fs.rubbish.mapper.RubbishListMapper;
 import team.fs.rubbish.service.IRubbishCategoryService;
 
 import java.util.List;
@@ -22,6 +24,9 @@ import java.util.List;
 public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
     @Autowired
     private RubbishCategoryMapper rubbishCategoryMapper;
+
+    @Autowired
+    private RubbishListMapper rubbishListMapper;
 
     /**
      * 查询分类管理
@@ -57,6 +62,7 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
 
         rubbishCategory.setCreateTime(DateUtils.getNowDate());
         rubbishCategory.setAncestors(info.getAncestors() + "," + rubbishCategory.getParentId());
+        rubbishCategory.setAncestorsStr(info.getAncestorsStr() + "/" + info.getCategoryName());
         return rubbishCategoryMapper.insertRubbishCategory(rubbishCategory);
     }
 
@@ -67,14 +73,22 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateRubbishCategory(RubbishCategory rubbishCategory) {
         RubbishCategory newParentRubbishCategory = rubbishCategoryMapper.selectRubbishCategoryByCategoryId(rubbishCategory.getParentId());
         RubbishCategory oldRubbishCategory = rubbishCategoryMapper.selectRubbishCategoryByCategoryId(rubbishCategory.getCategoryId());
         if (StringUtils.isNotNull(newParentRubbishCategory) && StringUtils.isNotNull(oldRubbishCategory)) {
             String newAncestors = newParentRubbishCategory.getAncestors() + "," + newParentRubbishCategory.getCategoryId();
+            String parentAncestorsStr = newParentRubbishCategory.getAncestorsStr();
+            String newAncestorStr = parentAncestorsStr
+                    + (StringUtils.isEmpty(parentAncestorsStr) ? "" : "/")
+                    + newParentRubbishCategory.getCategoryName();
             String oldAncestors = oldRubbishCategory.getAncestors();
+            String oldAncestorsStr = oldRubbishCategory.getAncestorsStr();
             rubbishCategory.setAncestors(newAncestors);
-            updateCategoryChildren(rubbishCategory.getCategoryId(), newAncestors, oldAncestors);
+            rubbishCategory.setAncestorsStr(newAncestorStr);
+
+            updateCategoryChildren(rubbishCategory.getCategoryId(), newAncestors, oldAncestors, newAncestorStr, oldAncestorsStr);
         }
         rubbishCategory.setUpdateTime(DateUtils.getNowDate());
         int result = rubbishCategoryMapper.updateRubbishCategory(rubbishCategory);
@@ -88,10 +102,13 @@ public class RubbishCategoryServiceImpl implements IRubbishCategoryService {
      * @param newAncestors 新的父ID集合
      * @param oldAncestors 旧的父ID集合
      */
-    public void updateCategoryChildren(Long categoryId, String newAncestors, String oldAncestors) {
+    public void updateCategoryChildren(Long categoryId,
+                                       String newAncestors, String oldAncestors,
+                                       String newAncestorsStr, String oldAncestorsStr) {
         List<RubbishCategory> children = rubbishCategoryMapper.selectChildrenCategoryById(categoryId);
         for (RubbishCategory child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            child.setAncestorsStr(child.getAncestorsStr().replaceFirst(oldAncestorsStr, newAncestorsStr));
         }
         if (children.size() > 0) {
             rubbishCategoryMapper.updateCategoryChildren(children);

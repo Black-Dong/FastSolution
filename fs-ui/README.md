@@ -28,3 +28,9 @@ npm run build:stage
 # 构建生产环境
 npm run build:prod
 ```
+
+
+## 现有问题
+
+当BmMarker和map同时添加点击事件时，没有找到阻止bmmarker冒泡的相关文档说明
+https://github.com/Dafrok/vue-baidu-map/issues/511

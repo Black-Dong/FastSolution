@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="team.fs.rubbish.mapper.RubbishListMapper">
-    
+
     <resultMap type="RubbishList" id="RubbishListResult">
         <result property="listId"    column="list_id"    />
         <result property="rubbishUrl"    column="rubbish_url"    />
@@ -19,25 +19,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectRubbishListVo">
-        select list_id, rubbish_url, rubbish_name, category_id, category_name, disposal_way, create_by, create_time, update_by, update_time, remark from rubbish_list
+        select l.list_id, l.rubbish_url, l.rubbish_name, l.category_id, concat(c.ancestors_str,'/',c.category_name) as category_name, l.disposal_way, l.create_by, l.create_time, l.update_by, l.update_time, l.remark
+        from rubbish_list l left join rubbish_category c on l.category_id = c.category_id
     </sql>
 
     <select id="selectRubbishListList" parameterType="RubbishList" resultMap="RubbishListResult">
         <include refid="selectRubbishListVo"/>
-        <where>  
+        <where>
             <if test="rubbishUrl != null  and rubbishUrl != ''"> and rubbish_url = #{rubbishUrl}</if>
             <if test="rubbishName != null  and rubbishName != ''"> and rubbish_name like concat('%', #{rubbishName}, '%')</if>
-            <if test="categoryId != null "> and category_id = #{categoryId}</if>
-            <if test="categoryName != null  and categoryName != ''"> and category_name like concat('%', #{categoryName}, '%')</if>
+            <if test="categoryName != null  and categoryName != ''"> and l.category_name like concat('%', #{categoryName}, '%')</if>
             <if test="disposalWay != null  and disposalWay != ''"> and disposal_way = #{disposalWay}</if>
+            <if test="categoryId != null ">
+            and (l.category_id = #{categoryId} or l.category_id in (SELECT category_id from rubbish_category WHERE find_in_set(#{categoryId}, ancestors)))
+            </if>
         </where>
     </select>
-    
+
     <select id="selectRubbishListByListId" parameterType="String" resultMap="RubbishListResult">
         <include refid="selectRubbishListVo"/>
         where list_id = #{listId}
     </select>
-        
+    <select id="selectByRubbishName" resultMap="RubbishListResult">
+        <include refid="selectRubbishListVo"/>
+        where rubbish_name = #{rubbishName}
+    </select>
+
     <insert id="insertRubbishList" parameterType="RubbishList" useGeneratedKeys="true" keyProperty="listId">
         insert into rubbish_list
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -88,7 +95,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteRubbishListByListIds" parameterType="String">
-        delete from rubbish_list where list_id in 
+        delete from rubbish_list where list_id in
         <foreach item="listId" collection="array" open="(" separator="," close=")">
             #{listId}
         </foreach>

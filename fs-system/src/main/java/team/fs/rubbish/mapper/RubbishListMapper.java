@@ -5,15 +5,15 @@ import team.fs.rubbish.domain.RubbishList;
 
 /**
  * 垃圾管理Mapper接口
- * 
+ *
  * @author Dong
  * @date 2022-08-23
  */
-public interface RubbishListMapper 
+public interface RubbishListMapper
 {
     /**
      * 查询垃圾管理
-     * 
+     *
      * @param listId 垃圾管理主键
      * @return 垃圾管理
      */
@@ -21,7 +21,7 @@ public interface RubbishListMapper
 
     /**
      * 查询垃圾管理列表
-     * 
+     *
      * @param rubbishList 垃圾管理
      * @return 垃圾管理集合
      */
@@ -29,7 +29,7 @@ public interface RubbishListMapper
 
     /**
      * 新增垃圾管理
-     * 
+     *
      * @param rubbishList 垃圾管理
      * @return 结果
      */
@@ -37,7 +37,7 @@ public interface RubbishListMapper
 
     /**
      * 修改垃圾管理
-     * 
+     *
      * @param rubbishList 垃圾管理
      * @return 结果
      */
@@ -45,7 +45,7 @@ public interface RubbishListMapper
 
     /**
      * 删除垃圾管理
-     * 
+     *
      * @param listId 垃圾管理主键
      * @return 结果
      */
@@ -53,9 +53,11 @@ public interface RubbishListMapper
 
     /**
      * 批量删除垃圾管理
-     * 
+     *
      * @param listIds 需要删除的数据主键集合
      * @return 结果
      */
     public int deleteRubbishListByListIds(String[] listIds);
+
+    RubbishList selectByRubbishName(String rubbishName);
 }

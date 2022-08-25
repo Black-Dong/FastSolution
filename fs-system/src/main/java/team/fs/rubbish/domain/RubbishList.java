@@ -7,7 +7,7 @@ import team.fs.common.core.domain.BaseEntity;
 
 /**
  * 垃圾管理对象 rubbish_list
- * 
+ *
  * @author Dong
  * @date 2022-08-23
  */
@@ -16,7 +16,7 @@ public class RubbishList extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 垃圾列表id */
-    private String listId;
+    private Long listId;
 
     /** 垃圾图片 */
     @Excel(name = "垃圾图片")
@@ -38,57 +38,57 @@ public class RubbishList extends BaseEntity
     @Excel(name = "处置方式")
     private String disposalWay;
 
-    public void setListId(String listId) 
+    public void setListId(Long listId)
     {
         this.listId = listId;
     }
 
-    public String getListId() 
+    public Long getListId()
     {
         return listId;
     }
-    public void setRubbishUrl(String rubbishUrl) 
+    public void setRubbishUrl(String rubbishUrl)
     {
         this.rubbishUrl = rubbishUrl;
     }
 
-    public String getRubbishUrl() 
+    public String getRubbishUrl()
     {
         return rubbishUrl;
     }
-    public void setRubbishName(String rubbishName) 
+    public void setRubbishName(String rubbishName)
     {
         this.rubbishName = rubbishName;
     }
 
-    public String getRubbishName() 
+    public String getRubbishName()
     {
         return rubbishName;
     }
-    public void setCategoryId(Long categoryId) 
+    public void setCategoryId(Long categoryId)
     {
         this.categoryId = categoryId;
     }
 
-    public Long getCategoryId() 
+    public Long getCategoryId()
     {
         return categoryId;
     }
-    public void setCategoryName(String categoryName) 
+    public void setCategoryName(String categoryName)
     {
         this.categoryName = categoryName;
     }
 
-    public String getCategoryName() 
+    public String getCategoryName()
     {
         return categoryName;
     }
-    public void setDisposalWay(String disposalWay) 
+    public void setDisposalWay(String disposalWay)
     {
         this.disposalWay = disposalWay;
     }
 
-    public String getDisposalWay() 
+    public String getDisposalWay()
     {
         return disposalWay;
     }

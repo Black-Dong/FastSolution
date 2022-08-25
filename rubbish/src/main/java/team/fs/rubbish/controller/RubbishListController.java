@@ -1,15 +1,22 @@
 package team.fs.rubbish.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import team.fs.common.annotation.Anonymous;
 import team.fs.common.annotation.Log;
+import team.fs.common.constant.UserConstants;
 import team.fs.common.core.controller.BaseController;
 import team.fs.common.core.domain.AjaxResult;
 import team.fs.common.core.page.TableDataInfo;
 import team.fs.common.enums.BusinessType;
+import team.fs.common.utils.PageUtils;
+import team.fs.common.utils.StringUtils;
 import team.fs.common.utils.poi.ExcelUtil;
 import team.fs.rubbish.domain.RubbishList;
+import team.fs.rubbish.mapper.RubbishListMapper;
 import team.fs.rubbish.service.IRubbishListService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +33,13 @@ import java.util.List;
 public class RubbishListController extends BaseController {
     @Autowired
     private IRubbishListService rubbishListService;
+
+    @Anonymous
+    @GetMapping("/selectByRubbishName/{rubbishName}")
+    public AjaxResult selectByRubbishName(@PathVariable("rubbishName")String rubbishName) {
+        RubbishList rubbish = rubbishListService.selectByRubbishName(rubbishName);
+        return AjaxResult.success(rubbish);
+    }
 
     /**
      * 查询垃圾管理列表
@@ -66,6 +80,9 @@ public class RubbishListController extends BaseController {
     @Log(title = "垃圾管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody RubbishList rubbishList) {
+        if (UserConstants.NOT_UNIQUE.equals(rubbishListService.checkRubbishNameUnique(rubbishList))) {
+            return AjaxResult.error("新增垃圾'" + rubbishList.getRubbishName() + "'失败，名称已存在");
+        }
         return toAjax(rubbishListService.insertRubbishList(rubbishList));
     }
 
@@ -76,6 +93,9 @@ public class RubbishListController extends BaseController {
     @Log(title = "垃圾管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody RubbishList rubbishList) {
+        if (UserConstants.NOT_UNIQUE.equals(rubbishListService.checkRubbishNameUnique(rubbishList))) {
+            return AjaxResult.error("新增垃圾'" + rubbishList.getRubbishName() + "'失败，名称已存在");
+        }
         return toAjax(rubbishListService.updateRubbishList(rubbishList));
     }
 

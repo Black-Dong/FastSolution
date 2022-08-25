@@ -24,6 +24,8 @@ public class RubbishCategory extends BaseEntity
 
     /** 祖级id */
     private String ancestors;
+    /** 祖级字符串 */
+    private String ancestorsStr;
 
     /** 垃圾分类名称 */
     @Excel(name = "垃圾分类名称")
@@ -63,6 +65,13 @@ public class RubbishCategory extends BaseEntity
         this.ancestors = ancestors;
     }
 
+    public String getAncestorsStr() {
+        return ancestorsStr;
+    }
+    public void setAncestorsStr(String ancestorsStr) {
+        this.ancestorsStr = ancestorsStr;
+    }
+
     public String getCategoryName()
     {
         return categoryName;
@@ -83,6 +92,7 @@ public class RubbishCategory extends BaseEntity
             .append("categoryId", getCategoryId())
             .append("parentId", getParentId())
             .append("ancestors", getAncestors())
+            .append("ancestorsStr", getAncestorsStr())
             .append("categoryName", getCategoryName())
             .append("disposalWay", getDisposalWay())
             .append("createBy", getCreateBy())

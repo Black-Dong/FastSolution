@@ -169,6 +169,7 @@ import {listList, getList, delList, addList, updateList} from "@/api/rubbish/lis
 import {listCategory} from "@/api/rubbish/category";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import {parseStrEmpty} from "@/utils/ruoyi";
 
 export default {
   name: "List",
@@ -234,7 +235,8 @@ export default {
   },
   methods: {
     categorySelected(category) {
-      this.form.categoryName = category.categoryName
+      let splitStr = parseStrEmpty(category.ancestorsStr) !== '' ? '/' : '';
+      this.form.categoryName = category.ancestorsStr + splitStr + category.categoryName
     },
     /** 转换垃圾分类数据结构 */
     normalizer(node) {

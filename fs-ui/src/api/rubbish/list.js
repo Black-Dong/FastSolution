@@ -1,6 +1,14 @@
 import request from '@/utils/request'
 
 // 查询垃圾管理列表
+export function selectByRubbishName(rubbishName) {
+  return request({
+    url: '/rubbish/list/selectByRubbishName/' + rubbishName,
+    method: 'get',
+  })
+}
+
+// 查询垃圾管理列表
 export function listList(query) {
   return request({
     url: '/rubbish/list/list',

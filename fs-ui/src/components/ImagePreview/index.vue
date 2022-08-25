@@ -28,12 +28,16 @@ export default {
     height: {
       type: [Number, String],
       default: ""
+    },
+    isLocal: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     realSrc() {
       let real_src = this.src.split(",")[0];
-      if (isExternal(real_src)) {
+      if (isExternal(real_src) || this.isLocal) {
         return real_src;
       }
       return process.env.VUE_APP_BASE_API + real_src;
@@ -42,7 +46,7 @@ export default {
       let real_src_list = this.src.split(",");
       let srcList = [];
       real_src_list.forEach(item => {
-        if (isExternal(item)) {
+        if (isExternal(item) || this.isLocal) {
           return srcList.push(item);
         }
         return srcList.push(process.env.VUE_APP_BASE_API + item);
@@ -68,7 +72,7 @@ export default {
     transition: all 0.3s;
     cursor: pointer;
     &:hover {
-      transform: scale(1.2);
+      transform: scale(1.1);
     }
   }
   ::v-deep .image-slot {
