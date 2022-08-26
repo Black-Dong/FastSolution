@@ -65,16 +65,20 @@
       </el-row>
     </div>
 
-    <baidu-map center="呼和浩特" class="bm-view m-t-20"
+    <baidu-map center="北京" class="bm-view m-t-20"
                ak="apKMRa4cdU2r1EelWCCH4bVrGTlzNeIl"
-               @click="clickBMap"
+               :zoom="30"
+               :scroll-wheel-zoom="true" @click="clickBMap"
     >
       <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
       <bm-city-list anchor="BMAP_ANCHOR_TOP_LEFT"></bm-city-list>
       <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
-      <bm-marker :position="{lng: 116.404, lat: 39.915}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"
-                 :icon="{url:fixPic, size: {width: 48, height: 48}}" @click="clickBMarker"
-      ></bm-marker>
+      <bm-marker v-for="item in bucketList" :key="item.bucketId"
+                 :position="{lng: item.lng, lat: item.lat}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"
+                 :icon="{url:fixPic, size: {width: 48, height: 48}}"
+                 :data-bucket-id="item.id"
+      >
+      </bm-marker>
     </baidu-map>
   </div>
 </template>
@@ -85,7 +89,7 @@ import {BmGeolocation, BmCityList, BmMarker,BmNavigation} from 'vue-baidu-map'
 
 import {selectByRubbishName} from "@/api/rubbish/list";
 import {parseStrEmpty} from "@/utils/ruoyi";
-
+import {listBucket} from "@/api/rubbish/bucket";
 
 export default {
   name: 'Index',
@@ -94,6 +98,7 @@ export default {
   },
   data() {
     return {
+      bucketList: [],
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -123,12 +128,14 @@ export default {
     }
   },
   mounted() {
+    this.getList()
   },
   methods: {
-    // 切割公司列表
-    splitCut(str) {
-      let strS = name.split("\n")
-      return strS
+    getList() {
+      console.log(1)
+      listBucket().then(response => {
+        this.bucketList = response.rows
+      })
     },
     subsearch() {
       if (parseStrEmpty(this.queryParams.rubbishName) !== '') {
@@ -145,13 +152,10 @@ export default {
     },
     clickBMap(point) {
       // console.log(point)
-      console.log(1)
-      console.log(point)
     },
     clickBMarker(point) {
-      console.log(2)
+      // console.log(point)
       point.domEvent.stopPropagation()
-      console.log(point)
     }
   }
 }
