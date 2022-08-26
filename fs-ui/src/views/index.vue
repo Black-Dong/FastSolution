@@ -74,7 +74,7 @@
       <bm-city-list anchor="BMAP_ANCHOR_TOP_LEFT"></bm-city-list>
       <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
       <bm-marker v-for="item in bucketList" :key="item.bucketId"
-                 :position="{lng: item.lng, lat: item.lat}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE"
+                 :position="{lng: item.lng, lat: item.lat}" :dragging="false" animation="BMAP_ANIMATION_BOUNCE"
                  :icon="{url:fixPic, size: {width: 48, height: 48}}"
                  :data-bucket-id="item.id"
       >
