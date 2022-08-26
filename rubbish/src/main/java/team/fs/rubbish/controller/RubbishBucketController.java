@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import team.fs.common.annotation.Anonymous;
 import team.fs.common.annotation.Log;
 import team.fs.common.core.controller.BaseController;
 import team.fs.common.core.domain.AjaxResult;
@@ -37,8 +38,9 @@ public class RubbishBucketController extends BaseController {
     /**
      * 查询垃圾站管理列表
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:list')")
+    // @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:list,rubbish:bucket:manage')")
     @GetMapping("/list")
+    @Anonymous
     public TableDataInfo list(RubbishBucket rubbishBucket) {
         // startPage();
         List<RubbishBucket> list = rubbishBucketService.selectRubbishBucketList(rubbishBucket);
@@ -48,7 +50,7 @@ public class RubbishBucketController extends BaseController {
     /**
      * 导出垃圾站管理列表
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:export')")
+    @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:export,rubbish:bucket:manage')")
     @Log(title = "垃圾站管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, RubbishBucket rubbishBucket) {
@@ -60,7 +62,7 @@ public class RubbishBucketController extends BaseController {
     /**
      * 获取垃圾站管理详细信息
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:query')")
+    @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:query,rubbish:bucket:manage')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") String id) {
         return AjaxResult.success(rubbishBucketService.selectRubbishBucketById(id));
@@ -69,7 +71,7 @@ public class RubbishBucketController extends BaseController {
     /**
      * 新增垃圾站管理
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:add')")
+    @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:add,rubbish:bucket:manage')")
     @Log(title = "垃圾站管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody RubbishBucket rubbishBucket) {
@@ -79,7 +81,7 @@ public class RubbishBucketController extends BaseController {
     /**
      * 修改垃圾站管理
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:edit')")
+    @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:edit,rubbish:bucket:manage')")
     @Log(title = "垃圾站管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody RubbishBucket rubbishBucket) {
@@ -89,7 +91,7 @@ public class RubbishBucketController extends BaseController {
     /**
      * 删除垃圾站管理
      */
-    @PreAuthorize("@ss.hasPermi('rubbish:bucket:remove')")
+    @PreAuthorize("@ss.hasAnyPermi('rubbish:bucket:remove,rubbish:bucket:manage')")
     @Log(title = "垃圾站管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
