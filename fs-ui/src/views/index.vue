@@ -21,12 +21,12 @@
         </el-col>
       </el-row>
 
-      <el-row class="m-t-20" :gutter="20">
+      <el-row class="m-t-20" :gutter="20" type="flex" justify="center">
         <el-col :span="24" style="text-align: center"
                 v-if="!hasRubbishResult && queryParams.rubbishName != ''">
           {{ resultMessage }}
         </el-col>
-        <el-col v-if="JSON.stringify(rubbishResult) !== '{}'" :offset="6" :span="6" style="text-align: center">
+        <el-col v-if="JSON.stringify(rubbishResult) !== '{}'" :span="6" style="text-align: center">
           <el-card :body-style="{ padding: '0px' }">
             <image-preview :src="String(rubbishResult.rubbishUrl)" width="100%" height="200px"/>
             <div style="padding: 14px 14px 10px 14px;">
@@ -37,7 +37,7 @@
             </div>
           </el-card>
         </el-col>
-        <el-col v-if="JSON.stringify(rubbishResult) !== '{}'" :span="6">
+        <el-col v-if="JSON.stringify(rubbishResult) !== '{}' && rubbishResult.disposalWay !==null" :span="6">
           <el-card :body-style="{ padding: '0px' }">
             <div slot="header" class="clearfix" style="text-align: center">
               <span>建议处理方式</span>
