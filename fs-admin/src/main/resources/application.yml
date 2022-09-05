@@ -121,3 +121,9 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+
+api:
+  rubbish:
+    appId: sqnmugmnspqditkh
+    appSecret: akw0SkhCOVoweWhWT3FQQ3dJNHgxUT09

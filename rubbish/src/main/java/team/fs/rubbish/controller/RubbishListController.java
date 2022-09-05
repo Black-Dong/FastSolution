@@ -1,26 +1,34 @@
 package team.fs.rubbish.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import team.fs.common.annotation.Anonymous;
+import team.fs.common.annotation.DataScope;
 import team.fs.common.annotation.Log;
 import team.fs.common.constant.UserConstants;
 import team.fs.common.core.controller.BaseController;
 import team.fs.common.core.domain.AjaxResult;
 import team.fs.common.core.page.TableDataInfo;
 import team.fs.common.enums.BusinessType;
-import team.fs.common.utils.PageUtils;
-import team.fs.common.utils.StringUtils;
 import team.fs.common.utils.poi.ExcelUtil;
+import team.fs.framework.interceptor.LoggingInterceptor;
 import team.fs.rubbish.domain.RubbishList;
-import team.fs.rubbish.mapper.RubbishListMapper;
 import team.fs.rubbish.service.IRubbishListService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 垃圾管理Controller
@@ -34,10 +42,41 @@ public class RubbishListController extends BaseController {
     @Autowired
     private IRubbishListService rubbishListService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${api.rubbish.appId}")
+    private String appId;
+
+    @Value("${api.rubbish.appSecret}")
+    private String appSecret;
+
     @Anonymous
     @GetMapping("/selectByRubbishName/{rubbishName}")
-    public AjaxResult selectByRubbishName(@PathVariable("rubbishName")String rubbishName) {
+    public AjaxResult selectByRubbishName(@PathVariable("rubbishName") String rubbishName) {
         RubbishList rubbish = rubbishListService.selectByRubbishName(rubbishName);
+        if (Objects.isNull(rubbish)) {
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.set("Content-Type", "application/json; charset=utf-8");
+            requestHeaders.set("APP_ID", appId);
+            requestHeaders.set("APP_SECRET", appSecret);
+            HttpEntity requestEntity = new HttpEntity(requestHeaders);
+            restTemplate.setInterceptors(Collections.singletonList(new LoggingInterceptor()));
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://www.mxnzp.com/api/rubbish/type?name=" + rubbishName,
+                    HttpMethod.GET,
+                    requestEntity,
+                    String.class
+            );
+            JSONObject obj = JSON.parseObject(response.getBody());
+            JSONObject data = obj.getJSONObject("data");
+            if (Objects.nonNull(data)) {
+                rubbish = new RubbishList();
+                JSONObject aim = data.getJSONObject("aim");
+                rubbish.setRubbishName(aim.getString("goodsName"));
+                rubbish.setCategoryName(aim.getString("goodsType"));
+            }
+        }
         return AjaxResult.success(rubbish);
     }
 

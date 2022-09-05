@@ -19,7 +19,7 @@
 
         <dependency>
             <groupId>team.fs</groupId>
-            <artifactId>fs-common</artifactId>
+            <artifactId>fs-framework</artifactId>
         </dependency>
 
         <dependency>
