@@ -63,6 +63,12 @@
 
         <dependency>
             <groupId>team.fs</groupId>
+            <artifactId>fs-activiti</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>team.fs</groupId>
             <artifactId>rubbish</artifactId>
         </dependency>
 

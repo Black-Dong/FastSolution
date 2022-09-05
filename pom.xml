@@ -32,6 +32,7 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
+        <activiti.version>6.0.0</activiti.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
 
@@ -192,6 +193,13 @@
                 <version>${fs.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>team.fs</groupId>
+                <artifactId>fs-activiti</artifactId>
+                <version>${fs.version}</version>
+            </dependency>
+
+
             <!-- 垃圾管理 -->
             <dependency>
                 <groupId>team.fs</groupId>
@@ -209,6 +217,7 @@
         <module>fs-generator</module>
         <module>fs-common</module>
         <module>rubbish</module>
+        <module>fs-activiti</module>
     </modules>
     <packaging>pom</packaging>
 

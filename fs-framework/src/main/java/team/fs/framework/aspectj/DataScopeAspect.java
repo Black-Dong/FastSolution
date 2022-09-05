@@ -9,8 +9,11 @@ import team.fs.common.core.domain.BaseEntity;
 import team.fs.common.core.domain.entity.SysRole;
 import team.fs.common.core.domain.entity.SysUser;
 import team.fs.common.core.domain.model.LoginUser;
+import team.fs.common.utils.ServletUtils;
 import team.fs.common.utils.StringUtils;
 import team.fs.common.utils.SecurityUtils;
+import team.fs.common.utils.spring.SpringUtils;
+import team.fs.framework.web.service.TokenService;
 
 /**
  * 数据过滤处理
@@ -61,7 +64,8 @@ public class DataScopeAspect
     protected void handleDataScope(final JoinPoint joinPoint, DataScope controllerDataScope)
     {
         // 获取当前的用户
-        LoginUser loginUser = SecurityUtils.getLoginUser();
+//        LoginUser loginUser = SecurityUtils.getLoginUser();
+        LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
         if (StringUtils.isNotNull(loginUser))
         {
             SysUser currentUser = loginUser.getUser();
