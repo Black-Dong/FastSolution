@@ -223,7 +223,7 @@
           if (valid) {
             addModeler(this.form).then(response => {
               if (response.code === 200) {
-                this.msgSuccess("新增成功");
+                this.$modal.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
 
@@ -252,7 +252,7 @@
           return delModeler(modelIds);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
         }).catch(function () {
         });
       },
@@ -289,7 +289,7 @@
         }).then(function () {
           return deployModeler(modelId);
         }).then(response => {
-          this.msgSuccess("部署成功");
+          this.$modal.msgSuccess("部署成功");
         }).catch(function () {
         });
       },

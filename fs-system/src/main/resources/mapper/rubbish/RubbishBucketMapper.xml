@@ -69,6 +69,12 @@
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+
+            <if test="applyUserId != null">apply_user_id = #{applyUserId},</if>
+            <if test="applyUserName != null">apply_user_name = #{applyUserName},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="instanceId != null">instance_id = #{instanceId},</if>
+            <if test="processKey != null">process_key = #{processKey},</if>
         </trim>
         where bucket_id = #{bucketId}
     </update>

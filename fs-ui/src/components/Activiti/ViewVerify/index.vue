@@ -68,7 +68,7 @@
               this.close();
               // 刷新待办事项列表（丑陋的代码 👇）
               this.$parent.$parent.$parent.$parent.$parent.$parent.getList();
-              this.msgSuccess("操作成功");
+              this.$modal.msgSuccess("操作成功");
             });
           }
         });

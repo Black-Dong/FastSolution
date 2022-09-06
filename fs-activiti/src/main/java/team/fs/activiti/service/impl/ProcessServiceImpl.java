@@ -55,19 +55,31 @@ public class ProcessServiceImpl implements IProcessService {
     private SysUserMapper userMapper;
     private TaskMapper taskMapper;
 
+    private static final String defaultGetIdMethodName = "getId";
+
     /**
      * 提交申请
      */
     @Override
     public <T> void submitApply(T entity, String key) throws Exception {
-        this.submitApply(entity, key, null);
+        this.submitApply(entity, key, defaultGetIdMethodName);
+    }
+
+    @Override
+    public <T> void submitApply(T entity, String key, String getIdMethodName) throws Exception {
+        this.submitApply(entity, key, null, getIdMethodName);
     }
 
     @Override
     public <T> void submitApply(T entity, String key, Map<String, Object> variables) throws Exception {
+        this.submitApply(entity, key, null, defaultGetIdMethodName);
+    }
+
+    @Override
+    public <T> void submitApply(T entity, String key, Map<String, Object> variables, String getIdMethodName) throws Exception {
         Class clazz = entity.getClass();
 
-        Method getId = clazz.getDeclaredMethod("getId");
+        Method getId = clazz.getDeclaredMethod(getIdMethodName);
         Long id = (Long) getId.invoke(entity);
 
         Method setApplyUserId = clazz.getDeclaredMethod("setApplyUserId", String.class);
@@ -108,7 +120,9 @@ public class ProcessServiceImpl implements IProcessService {
         taskMapper.insertInstanceBusiness(ib);
     }
 
-    /** 驼峰转下划线 */
+    /**
+     * 驼峰转下划线
+     */
     private String humpToLine(String str) {
         Pattern humpPattern = Pattern.compile("[A-Z]");
         Matcher matcher = humpPattern.matcher(str);
@@ -120,7 +134,9 @@ public class ProcessServiceImpl implements IProcessService {
         return sb.toString();
     }
 
-    /** 下划线转驼峰 */
+    /**
+     * 下划线转驼峰
+     */
     public static String lineToHump(String str) {
         str = str.toLowerCase();
         Pattern linePattern = Pattern.compile("_(\\w)");
@@ -396,7 +412,7 @@ public class ProcessServiceImpl implements IProcessService {
         // 手动过滤该条发起人数据
         boolean necessaryAdd = true;
         if ((StringUtils.isNotBlank(historicActivity.getActivityName()) && !startActivity.getActivityName().equals(historicActivity.getActivityName()))
-            || (StringUtils.isNotBlank(historicActivity.getAssignee()) && !startActivity.getAssignee().equals(historicActivity.getAssignee()))) {
+                || (StringUtils.isNotBlank(historicActivity.getAssignee()) && !startActivity.getAssignee().equals(historicActivity.getAssignee()))) {
             necessaryAdd = false;
         }
         if (necessaryAdd) {

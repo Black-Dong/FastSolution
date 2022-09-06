@@ -5,14 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import team.fs.activiti.service.IProcessService;
 import team.fs.common.annotation.Anonymous;
 import team.fs.common.annotation.Log;
 import team.fs.common.core.controller.BaseController;
@@ -34,6 +28,9 @@ import team.fs.common.core.page.TableDataInfo;
 public class RubbishBucketController extends BaseController {
     @Autowired
     private IRubbishBucketService rubbishBucketService;
+
+    @Autowired
+    private IProcessService processService;
 
     /**
      * 查询垃圾站管理列表
@@ -96,5 +93,24 @@ public class RubbishBucketController extends BaseController {
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids) {
         return toAjax(rubbishBucketService.deleteRubbishBucketByIds(ids));
+    }
+
+
+    /**
+     * 提交申请
+     */
+    @Log(title = "请假业务", businessType = BusinessType.UPDATE)
+    @PostMapping( "/submitApply/{id}")
+    @ResponseBody
+    public AjaxResult submitApply(@PathVariable String id) {
+        try {
+            RubbishBucket bucket = rubbishBucketService.selectRubbishBucketById(id);
+            processService.submitApply(bucket, "test", "getBucketId");
+            rubbishBucketService.updateRubbishBucket(bucket);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return error("提交申请出错：" + e.getMessage());
+        }
+        return success();
     }
 }

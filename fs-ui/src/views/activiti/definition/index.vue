@@ -245,7 +245,7 @@
           const data = { "id": pid, "suspendState": suspendState };
           return suspendOrActiveDefinition(data);
         }).then(response => {
-          this.msgSuccess("操作成功");
+          this.$modal.msgSuccess("操作成功");
           this.getList();
         }).catch(function () {
         });
@@ -261,7 +261,7 @@
           const data = { "processDefinitionId": pid };
           return convert2Model(data);
         }).then(response => {
-          this.msgSuccess("操作成功");
+          this.$modal.msgSuccess("操作成功");
           this.getList();
         }).catch(function () {
         });
@@ -277,7 +277,7 @@
           return delDefinition(deploymentId);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
         }).catch(function () {
         });
       },

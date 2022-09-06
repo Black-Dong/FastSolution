@@ -17,7 +17,11 @@ public interface IProcessService {
      */
     <T> void submitApply(T entity, String key) throws Exception;
 
+    <T> void submitApply(T entity, String key, String getIdMethodName) throws Exception;
+
     <T> void submitApply(T entity, String key, Map<String, Object> variables) throws Exception;
+
+    <T> void submitApply(T entity, String key, Map<String, Object> variables, String getIdMethodName) throws Exception;
 
     /**
      * 填充流程相关字段

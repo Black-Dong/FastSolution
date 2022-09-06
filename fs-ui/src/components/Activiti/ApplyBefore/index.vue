@@ -31,6 +31,10 @@
       row: {
         type: Object,
       },
+      objIdName: {
+        type: String,
+        default: 'id'
+      },
       handleUpdate: {
         type: Function,
       },
@@ -43,7 +47,7 @@
     },
     methods: {
       handleApply: function () {
-        const id = this.row.id;
+        const id = this.row[this.objIdName];
         const requestMapping = this.requestMapping;
         this.$confirm('是否提交ID为"' + id + '"的申请单据?', "警告", {
           confirmButtonText: "确定",
@@ -56,7 +60,7 @@
           });
         }).then(() => {
           this.$emit('getList');
-          this.msgSuccess("申请成功");
+          this.$modal.msgSuccess("申请成功");
         })
       },
       _handleUpdate: function () {

@@ -24,9 +24,8 @@
 
         <dependency>
             <groupId>team.fs</groupId>
-            <artifactId>fs-system</artifactId>
+            <artifactId>fs-activiti</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

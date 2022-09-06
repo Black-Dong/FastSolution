@@ -45,6 +45,20 @@
                      type="danger" style="flex: 1;margin-top: 8px"
                      @click="removeBucket">删 除
           </el-button>
+          <div style="display: flex" v-show="!bucketForm.instanceId" >
+            <el-button style="flex: 1;margin-top: 8px"
+              type="primary"
+              icon="el-icon-check"
+              @click="handleApply(bucketForm)"
+            >提交申请</el-button>
+          </div>
+<!--            <apply-after-->
+<!--              v-show="scope.row.instanceId"-->
+<!--              :row="scope.row"-->
+<!--              :taskId="scope.row.taskId"-->
+<!--              :type="scope.row.type"-->
+<!--              @getList="getList"-->
+<!--            ></apply-after>-->
         </div>
       </div>
     </el-drawer>
@@ -55,12 +69,16 @@
 import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 import {BmGeolocation, BmCityList, BmMarker} from 'vue-baidu-map'
 import {listBucket, getBucket, addBucket, updateBucket, delBucket} from "@/api/rubbish/bucket";
+import ApplyBefore from "@/components/Activiti/ApplyBefore/index";
+import ApplyAfter from "@/components/Activiti/ApplyAfter/index";
+import request from "@/utils/request";
 
 
 export default {
   name: 'Index',
   components: {
-    BaiduMap, BmGeolocation, BmCityList, BmMarker
+    BaiduMap, BmGeolocation, BmCityList, BmMarker,
+    ApplyBefore,ApplyAfter,
   },
   data() {
     return {
@@ -76,7 +94,8 @@ export default {
       drawerTitle: '',
       drawer: false,
       fixPic: require('@/assets/rubbish/垃圾桶_48.png'),
-      bucketList: []
+      bucketList: [],
+      requestMapping: '/rubbish/bucket'
     }
   },
   mounted() {
@@ -160,7 +179,27 @@ export default {
       listBucket().then(response => {
         this.bucketList = response.rows
       })
+    },
+
+    handleApply(bucket) {
+      const id = bucket.bucketId;
+      const bucketName = bucket.bucketName;
+      const requestMapping = this.requestMapping;
+      this.$confirm('是否提交ID为"' + id + '"的申请单据?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return request({
+          url: requestMapping + '/submitApply/' + id,
+          method: 'post',
+        });
+      }).then(() => {
+        this.getList()
+        this.$modal.msgSuccess("申请成功")
+      })
     }
+
   }
 }
 </script>

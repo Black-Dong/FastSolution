@@ -304,7 +304,7 @@
           });
         }).then(response => {
           this.$emit('getList');
-          this.msgSuccess("操作成功");
+          this.$modal.msgSuccess("操作成功");
         }).catch(function () {
         });
       },
@@ -323,7 +323,7 @@
           });
         }).then(response => {
           this.$emit('getList');
-          this.msgSuccess("操作成功");
+          this.$modal.msgSuccess("操作成功");
         }).catch(function () {
         });
       },
@@ -422,7 +422,7 @@
           });
         }).then(() => {
           this.$emit('getList');
-          this.msgSuccess("操作成功");
+          this.$modal.msgSuccess("操作成功");
           this.showUserTable = false;
         })
       },
