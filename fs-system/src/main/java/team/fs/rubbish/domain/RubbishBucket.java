@@ -1,9 +1,12 @@
 package team.fs.rubbish.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import team.fs.common.annotation.Excel;
 import team.fs.common.core.domain.BaseEntity;
+
+import java.util.Date;
 
 /**
  * 垃圾站管理对象 rubbish_bucket
@@ -29,6 +32,54 @@ public class RubbishBucket extends BaseEntity
     /** 垃圾站名称 */
     @Excel(name = "垃圾站名称")
     private String bucketName;
+
+    private String applyUserId;
+    private String applyUserName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date applyTime;
+    private String instanceId;
+    private String processKey;
+
+
+    public String getApplyUserId() {
+        return applyUserId;
+    }
+
+    public void setApplyUserId(String applyUserId) {
+        this.applyUserId = applyUserId;
+    }
+
+    public String getApplyUserName() {
+        return applyUserName;
+    }
+
+    public void setApplyUserName(String applyUserName) {
+        this.applyUserName = applyUserName;
+    }
+
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public String getProcessKey() {
+        return processKey;
+    }
+
+    public void setProcessKey(String processKey) {
+        this.processKey = processKey;
+    }
 
     public void setBucketId(String bucketId)
     {
@@ -79,6 +130,11 @@ public class RubbishBucket extends BaseEntity
                 .append("updateBy", getUpdateBy())
                 .append("updateTime", getUpdateTime())
                 .append("remark", getRemark())
+                .append("applyUserId", getApplyUserId())
+                .append("applyUserName", getApplyUserName())
+                .append("applyTime", getApplyTime())
+                .append("instanceId", getInstanceId())
+                .append("processKey", getProcessKey())
                 .toString();
     }
 }

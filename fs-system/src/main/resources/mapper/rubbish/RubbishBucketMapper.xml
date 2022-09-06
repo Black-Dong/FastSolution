@@ -14,10 +14,17 @@
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
+        <result property="applyUserId"    column="apply_user_id"    />
+        <result property="applyUserName"    column="apply_user_name"    />
+        <result property="applyTime"    column="apply_time"    />
+        <result property="instanceId"    column="instance_id"    />
+        <result property="processKey"    column="process_key"    />
     </resultMap>
 
     <sql id="selectRubbishBucketVo">
-        select bucket_id, lng, lat, bucket_name, create_by, create_time, update_by, update_time, remark from rubbish_bucket
+        select bucket_id, lng, lat, bucket_name, create_by, create_time, update_by, update_time, remark,
+               apply_user_id, apply_user_name, apply_time, instance_id, process_key
+        from rubbish_bucket
     </sql>
 
     <select id="selectRubbishBucketList" parameterType="RubbishBucket" resultMap="RubbishBucketResult">
@@ -45,6 +52,12 @@
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
+
+            <if test="applyUserId != null">apply_user_id,</if>
+            <if test="applyUserName != null">apply_user_name,</if>
+            <if test="applyTime != null">apply_time,</if>
+            <if test="instanceId != null">instance_id,</if>
+            <if test="processKey != null">process_key,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="lng != null">#{lng},</if>
@@ -55,6 +68,12 @@
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
+
+            <if test="applyUserId != null">#{applyUserId},</if>
+            <if test="applyUserName != null">#{applyUserName},</if>
+            <if test="applyTime != null">#{applyTime},</if>
+            <if test="instanceId != null">#{instanceId},</if>
+            <if test="processKey != null">#{processKey},</if>
         </trim>
     </insert>
 
