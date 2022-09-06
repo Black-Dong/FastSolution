@@ -33,6 +33,12 @@
             <if test="lng != null  and lng != ''"> and lng = #{lng}</if>
             <if test="lat != null  and lat != ''"> and lat = #{lat}</if>
             <if test="bucketName != null  and bucketName != ''"> and bucket_name like concat('%', #{bucketName}, '%')</if>
+
+            <if test="applyUserId != null"> and apply_user_id = #{applyUserId}</if>
+            <if test="applyUserName != null"> and apply_user_name = #{applyUserName}</if>
+            <if test="applyTime != null"> and apply_time = #{applyTime}</if>
+            <if test="instanceId != null"> and instance_id = #{instanceId}</if>
+            <if test="processKey != null"> and process_key = #{processKey}</if>
         </where>
     </select>
 
